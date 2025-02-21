@@ -1,4 +1,4 @@
-[For the English documentation click here (or jump to English translation)](#english)
+[For the English documentation click here](#english)
 
 ---
 
