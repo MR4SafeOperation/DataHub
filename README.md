@@ -1,4 +1,4 @@
-# Anleitung zur Erstellung eines MR4B DataHub Moduls
+# Anleitung zur Erstellung eines MR-DataHub Moduls
 
 ## Inhalt
 
