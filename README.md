@@ -185,6 +185,7 @@ type RoesbergData
 ```
 
 Damit wäre der neue Typ bereits verfügbar und z.B. im GraphQL Frontend sichtbar, zunächst ohne Daten:
+
 ![grafik](https://github.com/user-attachments/assets/2401db14-76b1-44a8-b499-d82b45cfb310)
 
 
@@ -289,6 +290,7 @@ export {
 ```bash
 docker compose up -d
 ```
+
 ![grafik](https://github.com/user-attachments/assets/bdcbe6bb-7637-4f1b-80ec-2abc88f7c013)
 
 2. Nach einigen Sekunden sollte das neue backend Modul erfolgreich gestartet sein.
@@ -299,4 +301,5 @@ http://localhost:8000
 ```
 
 Nun sollten im Frontend für den neuen Typ Einträge auf Basis der Daten aus der REST-API sichtbar sein:
+
 ![grafik](https://github.com/user-attachments/assets/af9b1d3c-6f85-41d7-9106-d3cf5209778f)
