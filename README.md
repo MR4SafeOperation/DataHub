@@ -1,4 +1,4 @@
-# Anleitung zur Erstellung eines MR4B DataHub Moduls
+# Anleitung zur Erstellung eines MR-DataHub Moduls
 
 ## Inhalt
 
@@ -31,7 +31,7 @@
 
 ## Einleitung
 
-Der MR4B DataHub Server ist ein auf GraphQL basierender Server-Application-Stack, der eine flexible und skalierbare Datenverwaltung bietet.
+Der MR4B DataHub Server ist ein auf GraphQL basierender Server-Application-Stack, der eine flexible und skalierbare Datenverwaltung bietet: [https://github.com/foprs/datahub-mr4b](https://github.com/foprs/datahub-mr4b)
 
 Um eine Backend-Anwendung mit dem MR4B DataHub Server-Backend zu erzeugen, wird ein entsprechendes Modul benötigt. Das grundlegende Setup von Datenbank, Webserver etc. wird dabei vom DataHub Server bereitgestellt.
 
