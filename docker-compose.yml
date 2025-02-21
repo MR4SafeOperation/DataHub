@@ -1,0 +1,73 @@
+﻿## Copyright (c) 2024 FoP Consult GmbH
+## All rights reserved.
+
+version: "3.8"
+services:
+
+  ### GraphQL Frontend Instance ###
+  cms:
+    image: ris088/gql-frontend
+    container_name: cms
+    volumes:
+      - ./cms:/output
+    environment:
+      - VITE_DEFAULT_API_PATH=api/
+      - VITE_DEFAULT_TOKEN_PATH=token/
+      - VITE_LICENSE_KEY=${CMS_LICENSE_KEY} # Set this in the .env file
+
+  ### MR4B DataHub Backend Instance, using example_module ###
+  backend:
+    depends_on:
+      cms:
+        condition: service_completed_successfully
+      neo4j:
+        condition: service_healthy
+    image: ris088/datahub-backend
+    container_name: datahub-example-backend
+    volumes:
+      - ./example_module:/module
+      - ./cms:/cms
+    ports:
+      - "8123:8000"
+      - "9229:9229" # Debugger Port, remove this in production
+    command: node --inspect=0.0.0.0:9229 --watch-path=/module/schemas --watch-path=/module/src app.js
+    restart: unless-stopped
+    environment:
+      - DH_DB_URL=bolt://datahub-neo4j:7687
+      - DH_DB_DATABASE=neo4j
+      - DH_DB_USER=neo4j
+      - DH_DB_PASSWORD=data-hub
+      - DH_SERVER_HOST=0.0.0.0
+      - DH_SERVER_PORT=8000
+      - NODE_ENV= # This sets development mode and enables Apollo Sandbox at /api. Remove this line in production
+
+  ### Neo4j Database Instance ###
+  neo4j:
+    image: neo4j:5.7.0-community
+    hostname: datahub-neo4j
+    container_name: datahub-neo4j
+    volumes:
+      - ./neo4j/uploads:/uploads/
+      - ./neo4j/backup:/backup/
+      - ./neo4j/plugins:/plugins
+      - ./neo4j/data:/data
+      - ./neo4j/import:/var/lib/neo4j/import
+      - ./neo4j/ssl:/ssl
+      - ./neo4j/conf:/conf
+      - ./neo4j/logs:/logs
+      - ./neo4j/cypher:/cypher
+    healthcheck:
+        test: wget http://localhost:7474 || exit 1
+        interval: 3s
+        timeout: 120s
+        retries: 20
+        start_period: 5s
+    environment:
+      NEO4J_dbms_memory_pagecache_size: 1G
+      NEO4J_dbms_memory_heap_initial__size: 5G
+      NEO4J_dbms_memory_heap_max__size: 5G
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes'
+      NEO4J_AUTH: 'neo4j/data-hub'
+      NEO4J_PLUGINS: '["apoc"]'
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8

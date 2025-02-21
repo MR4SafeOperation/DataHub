@@ -1,0 +1,1 @@
+﻿In the default configuration, this directory will contain the files uploaded and provided by the [File Service](../FILESERVICE.md).

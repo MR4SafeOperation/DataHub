@@ -1,0 +1,11 @@
+cms*
+.env
+
+!/neo4j
+/neo4j/*
+!/neo4j/conf/
+!/neo4j/cypher/
+/neo4j/cypher/*
+!/neo4j/cypher/import-cypher.sh
+!/neo4j/cypher/sample_data.cypher
+

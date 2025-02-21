@@ -1,0 +1,19 @@
+input UserKnownInfo {
+    firstName: String!
+    lastName: String!
+}
+
+type Query
+{
+    GenerateExternalUser(userInfo: UserKnownInfo): ExternalUser
+
+    GetMyUsername: String
+    @cypher(statement: """
+        RETURN $jwt.username AS username
+    """, columnName: "username")
+
+    GetEnvironmentTestVariable: String
+
+
+}
+

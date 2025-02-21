@@ -1,0 +1,10 @@
+﻿# Placeholder configuration file for the JetBrains GraphQL Plug-In
+
+# This file not only defines where to find the GraphQL schemas used for Syntax Highlighting and Code Completion
+# in JetBrains IDEs, but also declares the root of a GraphQL project by its pure existence.
+# This prevents conflicts with schemas of other DataHub Modules in a same parent Git repository,
+# if this repo is added as submodule.
+
+schema:
+  - neo4j_base_defs.graphql
+  - schemas/**/*.graphql
