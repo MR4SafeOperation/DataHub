@@ -191,7 +191,11 @@ Damit wäre der neue Typ bereits verfügbar und z.B. im GraphQL Frontend sichtba
 
 ### 4.5 Daten von REST API verwenden
 
-Als einfaches Beispiel greifen wir auf Daten aus einer REST API zu und erzeugen damit Einträge des neuen Typs RoesbergData. Dazu kann die Datei resolvers.js im Unterverzeichnis src des Modulverzeichnisses angepasst werden:
+Als einfaches Beispiel greifen wir auf Daten aus einer REST API zu und erzeugen damit Einträge des neuen Typs RoesbergData. Dazu kann die Datei resolvers.js im Unterverzeichnis src des Modulverzeichnisses angepasst werden.
+Es wird zum einen eine Funktion benötigt, die Daten aus externer Quelle, wie z.B. über eine REST API, holen kann. Im Beispiel für den Typ RoesbergData ist die z.B. die Funktion roesbergData, die im folgenden Code-Beispiel zu sehen ist.
+Zum anderen wird für das Headless CMS eine Funktion benötigt, die die Anzahl der Elemente ermittelt, die von diesem Resolver zur Verfügung gestellt wird. Im Beispiel ist dies die Funktion roesbergDataAggregate. 
+Abschließend muss die resolvers-Query angepasst werden, so dass die beiden zuvor genannten Funktionen genutzt werden.
+Die resolvers.js kann z.B. so aufgebaut werden:
 
 ```javascript
 const FAKE_API_URL = 'https://reqres.in/api/users';
@@ -269,7 +273,7 @@ GenerateRoesbergData(userInfo: UserKnownInfo): RoesbergData
 
 ### 4.7 Die Datei module.js
 
-In der Datei module.js, welche im Modulordner liegt, muss die angepasste resolvers.js aus dem Unterverzeichnis src importiert werden:
+In der Datei module.js, welche im Modulordner liegt, also im Beispiel in roesberg_module. muss die angepasste resolvers.js aus dem Unterverzeichnis src importiert werden. Der Inhalt der module.js könnte dann z.B. so aussehen:
 
 ```javascript
 import {getResolvers} from './src/resolvers.js';
