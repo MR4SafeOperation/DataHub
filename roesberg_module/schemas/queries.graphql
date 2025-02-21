@@ -1,0 +1,20 @@
+input UserKnownInfo {
+    firstName: String!
+    lastName: String!
+}
+
+type Query
+{
+    GenerateRoesbergData(userInfo: UserKnownInfo): RoesbergData
+    GenerateExternalUser(userInfo: UserKnownInfo): ExternalUser
+
+    GetMyUsername: String
+    @cypher(statement: """
+        RETURN $jwt.username AS username
+    """, columnName: "username")
+
+    GetEnvironmentTestVariable: String
+
+
+}
+

@@ -23,12 +23,12 @@ services:
       neo4j:
         condition: service_healthy
     image: ris088/datahub-backend
-    container_name: datahub-example-backend
+    container_name: datahub-roesberg-backend
     volumes:
-      - ./example_module:/module
+      - ./roesberg_module:/module
       - ./cms:/cms
     ports:
-      - "8123:8000"
+      - "8000:8000"
       - "9229:9229" # Debugger Port, remove this in production
     command: node --inspect=0.0.0.0:9229 --watch-path=/module/schemas --watch-path=/module/src app.js
     restart: unless-stopped
