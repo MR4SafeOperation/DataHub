@@ -1,3 +1,7 @@
+[For the English documentation click here (or jump to English translation)](#english)
+
+---
+
 # Anleitung zur Erstellung eines MR4B DataHub Moduls
 
 ## Inhaltsverzeichnis
@@ -307,3 +311,317 @@ http://localhost:8000
 Nun sollten im Frontend für den neuen Typ Einträge auf Basis der Daten aus der REST-API sichtbar sein:
 
 ![grafik](https://github.com/user-attachments/assets/af9b1d3c-6f85-41d7-9106-d3cf5209778f)
+
+---
+---
+
+# English
+
+# Guide to Creating an MR4B DataHub Module
+
+## Table of Contents
+1. [Introduction](#1-introduction)
+2. [Prerequisites](#2-prerequisites)
+   - [Docker Installation](#21-docker-installation)
+   - [Node.js](#22-nodejs)
+   - [MR4B DataHub](#23-mr4b-datahub)
+3. [Module Creation Basics](#3-module-creation-basics)
+   - [GraphQL Schema](#31-graphql-schema)
+   - [JavaScript](#32-javascript)
+   - [File Service](#33-file-service)
+4. [Module Creation](#4-module-creation)
+   - [Creating a Module Copy](#41-creating-a-module-copy)
+   - [Modifying package.json](#42-modifying-packagejson)
+   - [Modifying docker-compose.yml](#43-modifying-docker-composeyml)
+   - [Adding a New Data Type](#44-adding-a-new-data-type)
+   - [Using Data from REST API](#45-using-data-from-rest-api)
+   - [The queries.graphql File](#46-the-queriesgraphql-file)
+   - [The module.js File](#47-the-modulejs-file)
+   - [Testing](#48-testing)
+
+## 1 Introduction
+
+The MR4B DataHub Server is a GraphQL-based server application stack that provides flexible and scalable data management.
+
+To generate a backend application from the MR4B DataHub Server backend, a corresponding MR4B DataHub module is required. The basic setup of database, web server, etc., does not need to be prepared as it is provided by the DataHub Server.
+
+## 2 Prerequisites
+
+The following prerequisites must be met:
+
+### 2.1 Docker Installation
+
+https://docs.docker.com/desktop/setup/install/windows-install/
+
+**Notes:**
+- During first startup, most questions in the top right can be skipped using "Skip".
+- Docker automatically installs on C: drive with the Windows installer. Sufficient storage space must be available there.
+- At least 20 GB of free storage space is recommended.
+
+### 2.2 Node.js
+
+https://nodejs.org/en/download/prebuilt-installer
+
+**Note:** Standard installation, currently no options need to be changed or additionally selected.
+
+### 2.3 MR4B DataHub
+
+Download ZIP file from:
+https://github.com/foprs/datahub-mr4b?tab=readme-ov-file
+
+Project information can be found at the following URL on GitHub:
+https://github.com/foprs/datahub-mr4b
+
+## 3 Module Creation Basics
+
+When creating your own MR4B DataHub module, the following areas need to be considered:
+
+### 3.1 GraphQL Schema
+
+Types, queries, and mutations are defined in files with the .graphql extension in the schemas folder.
+
+### 3.2 JavaScript
+
+JavaScript can optionally be used to customize the following functionalities:
+- Custom Resolvers
+- Authentication
+- Custom REST Endpoints / Initialization
+
+To use JavaScript, the module.js file must exist in the directory of the new module. The module.js file should only serve as an entry point and call externally defined methods. For developing custom business logic, it is recommended to store corresponding files in the src subdirectory and make them usable in the module.js file using import statements.
+
+#### 3.2.1 Custom Resolvers
+
+Custom resolvers allow fields to be defined in the schema, particularly to implement connections to external interfaces, databases, or APIs.
+To define custom resolvers, the following method must be exported in the module.js file:
+
+```javascript
+export async function getResolvers(datahub, context) { ... }
+```
+
+#### 3.2.2 Authentication
+
+MR4B DataHub currently supports OAuth 2.0 for authentication.
+To define the OAuth 2.0 configuration and required callbacks, the following method must be exported in the module.js file:
+
+```javascript
+export async function getOAuthServerOptions(datahub, context) { ... }
+```
+
+More information about OAuth:
+https://oauth2-server.readthedocs.io/en/latest/api/oauth2-server.html
+
+#### 3.2.3 Custom REST Endpoints / Initialization
+
+Modules can define initialization logic by exporting one or both of the following methods in the module.js file:
+
+```javascript
+export async function preInitModule(datahub, context) { ... }
+export async function initModule(datahub, context) { ... }
+```
+
+The `preInitModule()` method is executed before all other callbacks including authentication (OAuth 2.0) and GraphQL server (Apollo) initialization, making it suitable for early custom initializations.
+
+The `initModule()` method should be used for custom REST endpoints or initializations that require the DataHub middleware. This method is called after OAuth 2.0 authentication is set up, the Apollo Server is started, and the API and CMS endpoints are defined.
+
+### 3.3 File Service
+
+The MR4B DataHub provides a FileService consisting of predefined REST endpoints for uploading, deleting, and downloading files.
+
+#### 3.3.1 Upload
+
+The following endpoints can be used for uploading:
+- POST /file/upload (multipart/form-data)
+- PUT /file/upload (multipart/form-data)
+- PUT /file/upload/{:identifier} (multipart/form-data)
+
+#### 3.3.2 Delete
+
+The following endpoint can be used for deleting files:
+- DELETE /file/{:identifier}
+
+#### 3.3.3 Download
+
+There are two ways to download a file:
+- With Authentication Header: The client sends a GET request with an authentication header.
+  `GET /file/{:identifier}`
+- Without Authentication Header: The client sends a GET request with a temporary JWT token appended as a URL path parameter.
+  `GET /file/get_token/{:identifier}`
+
+More information about the File Service:
+https://github.com/foprs/datahub-mr4b/blob/main/server/example_module/FILESERVICE.md
+
+## 4 Module Creation
+
+A new module can be created, for example, in the following steps by copying and editing an existing module, such as the included example_module.
+
+### 4.1 Creating a Module Copy
+
+First, create a copy of an existing module, e.g., by copying the example_module folder in the server directory. In this example, we'll call the copy roesberg_module.
+
+### 4.2 Modifying package.json
+
+In the roesberg_module directory (in the server directory), you'll find the package.json file. Open this file with a text editor and modify name, version, and description, e.g.:
+
+```json
+{
+  "name": "roesberg_datahub_module",
+  "version": "1.0.0",
+  "description": "Roesberg DataHub module"
+}
+```
+
+### 4.3 Modifying docker-compose.yml
+
+In the server directory, you'll find the docker-compose.yml file. Open this file with a text editor and modify the backend section to use the new roesberg_module as the backend. Under volumes, the new module directory followed by :/module must be specified. Also, the container_name should be modified, e.g., to datahub-roesberg-backend:
+
+```yaml
+backend:
+  depends_on:
+    cms:
+      condition: service_completed_successfully
+    neo4j:
+      condition: service_healthy
+  image: ris088/datahub-backend
+  container_name: datahub-roesberg-backend
+  volumes:
+    - ./roesberg_module:/module
+    - ./cms:/cms
+  ports:
+```
+
+### 4.4 Adding a New Data Type
+
+As a simple example, we'll add a new type "RoesbergData" to the types present in the module. To do this, the following must be inserted into the types.graphql file in the schemas subdirectory of the module directory:
+
+```graphql
+type RoesbergData
+@mutation(operations: []) # Make this type read-only
+{
+    id: Int!
+    formData: String!
+    contact: String!
+}
+```
+
+This would make the new type available and visible in the GraphQL frontend, initially without data:
+
+![graphic](https://github.com/user-attachments/assets/2401db14-76b1-44a8-b499-d82b45cfb310)
+
+### 4.5 Using Data from REST API
+
+As a simple example, we'll access data from a REST API and create entries of the new RoesbergData type. The resolvers.js file in the src subdirectory of the module directory can be modified for this purpose.
+First, a function is needed that can fetch data from an external source, such as through a REST API. In the example for the RoesbergData type, this is the roesbergData function, which can be seen in the following code example.
+Additionally, for the Headless CMS, a function is needed that determines the number of elements provided by this resolver. In the example, this is the roesbergDataAggregate function.
+Finally, the resolvers query must be modified so that both previously mentioned functions are used.
+The resolvers.js can be structured like this:
+
+```javascript
+const FAKE_API_URL = 'https://reqres.in/api/users';
+
+/**
+* Resolver for fetching RoesbergData with custom fields from an external data source.
+*/
+async function roesbergData(parent, args, context, info) {
+    let { limit, offset } = args.options;
+    limit = limit || 10;
+    offset = offset || 0;
+
+    let res = await fetch(FAKE_API_URL);
+    let { per_page, total } = await res.json();
+
+    if (offset > total || offset < 0) {
+        return [];
+    }
+
+    const pageOffset = Math.floor(offset / per_page) + 1;
+    const pageLimit = Math.ceil((offset + limit) / per_page);
+
+    const pagePromises = [];
+    for (let i = pageOffset; i <= pageLimit; i++) {
+        pagePromises.push(fetch(FAKE_API_URL + "?page=" + i));
+    }
+
+    const pageResponses = await Promise.all(pagePromises);
+    const pageData = await Promise.all(pageResponses.map(res => res.json()));
+
+    const allData = pageData.reduce((acc, page) => acc.concat(page.data), []);
+
+    // Function to generate a 6-character random string
+    const generateRandomString = () => Math.random().toString(36).substring(2, 8);
+
+    // Map data to fit RoesbergData type with custom fields
+    const roesbergData = allData.slice(offset % per_page, (offset % per_page) + limit).map(user => ({
+        id: user.id,
+        formData: generateRandomString(),
+        contact: `${user.first_name.charAt(0)}.${user.last_name}`
+    }));
+
+    return roesbergData;
+}
+
+/**
+ * Example resolver for counting data from an external data source.
+ * The Headless CMS requires the total count of available items provided by this resolver
+ * in order to dynamically generate the tables.
+ */
+async function roesbergDataAggregate(parent, args, context, info) {
+    const res = await fetch(FAKE_API_URL);
+    const resJson = await res.json();
+    return {count: resJson.total};
+}
+
+const resolvers = {
+    Query: {
+        // The following two overwrite the auto-generated resolvers for the `RoesbergData` type
+        roesbergData,
+        roesbergDataAggregate
+    },
+}
+
+export const getResolvers = () => resolvers;
+```
+
+### 4.6 The queries.graphql File
+
+In the module's schemas subdirectory, the queries.graphql file is located. The following line should be added to the type Query block for our example:
+
+```graphql
+GenerateRoesbergData(userInfo: UserKnownInfo): RoesbergData
+```
+
+### 4.7 The module.js File
+
+In the module.js file, which is located in the module directory (in our example, roesberg_module), the modified resolvers.js from the src subdirectory must be imported. The content of module.js could then look like this:
+
+```javascript
+import {getResolvers} from './src/resolvers.js';
+import {getOAuthServerOptions, getProtectedEndpoints} from "./src/auth.js";
+import {applyEndpoints} from "./src/endpoints.js";
+
+export {
+    getResolvers,
+    getOAuthServerOptions,
+    getProtectedEndpoints,
+    applyEndpoints as initModule
+};
+```
+
+### 4.8 Testing
+
+1. To test the new module, execute the following command in its server subdirectory:
+```bash
+docker compose up -d
+```
+
+![graphic](https://github.com/user-attachments/assets/bdcbe6bb-7637-4f1b-80ec-2abc88f7c013)
+
+2. After a few seconds, the new backend module should be successfully started.
+
+3. Then open the following link in a web browser to see the module with the data in the GraphQL frontend:
+```
+http://localhost:8000
+```
+
+Now entries based on the data from the REST API should be visible in the frontend for the new type:
+
+![graphic](https://github.com/user-attachments/assets/af9b1d3c-6f85-41d7-9106-d3cf5209778f)
