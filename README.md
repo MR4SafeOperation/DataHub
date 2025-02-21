@@ -153,7 +153,7 @@ Im Verzeichnis roesberg_module (im Verzeichnis server) befindet sich die Datei p
 
 ### 4.3 Anpassen der Datei docker-compose.yml
 
-Im Verzeichnis server befindet sich die Datei docker-compose.yml. Diese Datei mit einem Texteditor öffnen und den Bereich backend anpassen:
+Im Verzeichnis server befindet sich die Datei docker-compose.yml. Diese Datei mit einem Texteditor öffnen und den Bereich backend anpassen, um z.B. das neue Modul roesberg_module als Backend zu verwenden. Unter volumes muss das neue Modulverzeichnis gefolgt von :/module angegeben sein. Außerdem sollte der container_name angepasst werden, z.B. in datahub-roesberg-backend:
 
 ```yaml
 backend:
