@@ -1,5 +1,43 @@
 ﻿import axios from 'axios';
-export function applyEndpoints({app}) {
+import mqtt from 'mqtt';
+export function applyEndpoints(datahub) {
+
+var app = datahub.app;
+var executeCypher = datahub.executeCypher;
+ console.log("Params",datahub);
+const client = mqtt.connect("mqtt://192.168.178.11:1883");
+
+client.on("connect", () => {
+  console.log("Connected to Demonstrator | MQTT-Server")
+  client.subscribe("MR4SO/#", (err) => {
+    if (!err) {
+      console.log("Topic MR4SO/# suscribed")
+    } else {
+      console.error("Error at subscribing: ", err)
+    }
+  });
+});
+
+client.on("message", async (topic, message) => {
+  const value = message.toString();
+  console.log("Received: ", topic, value);
+
+  const cypherQuery = "CREATE (d:DemonstratorPlantData {topic : $topic, value: $value }) RETURN d";
+
+  try {
+    const result = await executeCypher(cypherQuery, { topic, value });
+    const savedNode = result.records[0].get("d").properties;
+    console.log("Data saved", savedNode);
+  } catch (error) {
+    console.error("Error while writing DemonstratorPlantData:", error.message);
+  }
+
+});
+
+client.on("error", (error) => {
+  console.error("MQTT error:", error);
+});
+
     app.get('/hello_world', (req, res) => {
         res.send('Hello World');
     });

@@ -88,3 +88,8 @@ type RoesbergData
     contact: String!
 }
 
+type DemonstratorPlantData
+{
+    topic: String!
+    value: String!
+}
