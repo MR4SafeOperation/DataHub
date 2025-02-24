@@ -1,0 +1,29 @@
+
+AN Example Graphql querry 
+
+query projects {
+  projects {
+    contractID
+    contractName
+    customer
+    foldername
+    projectIndex
+    unitConfig
+    drawings {
+      cIdentnumber
+      drawingID
+      drawingIndex
+      drawingType
+      drawingUID
+      filename
+      identNummer
+      lastChanged
+      lastChangedBy
+      projectIndex
+    }
+  }
+}
+
+
+example Rest request. Note that guid is regenerated on server restart and must me querried via graphql from above
+http://localhost:8000/xvforward?path=/FileApi/ConvertSVG?guid=f3ee9704-8ee8-46e3-b06c-f1fdf9595c96
