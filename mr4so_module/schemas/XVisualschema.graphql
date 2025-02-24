@@ -1,0 +1,1057 @@
+schema {
+  query: Query
+}
+
+type CMGroup {
+  drawingIndex: Long!
+  id: Int!
+  cmGuid: String
+  autom_CM_Tag: String
+  autom_CM_Description: String
+  autom_CM_LongDescription: String
+  autom_CM_IsGroup: Boolean!
+  drawingUID: String
+  parentID: Int!
+  eqmGuid: String
+  drawingIndexNavigation: Drawing
+  automationFunctionStepCMStates: [FunctionStepCMState]
+  automationCMStates: [CMState]
+}
+
+type CMMainState {
+  drawingIndex: Long!
+  id: Int!
+  autom_CM_STATE: String
+  autom_CM_DESCRIPTION: String
+  autom_CM_STATE_COLOR: String
+  autom_CM_STATE_ACTIVE: Boolean!
+  drawingIndexNavigation: Drawing
+  automationFunctionStepCMStates: [FunctionStepCMState]
+}
+
+type CMState {
+  drawingIndex: Long!
+  id: Int!
+  main_ID: Int!
+  cm_ID: String
+  autom_CM_STATE: String
+  autom_CM_DESCRIPTION: String
+  autom_CM_RUNTIME_PARAMETERS: String
+  autom_CM_CONFIG_PARAMETERS: String
+  autom_CM_STATE_COLOR: String
+  cmIndexNavigation: CMGroup
+}
+
+type Class {
+  classID: Int!
+  class1: String
+  dependentClasses: String
+  tag: String
+  classCustomProperties: [ClassCustomProperty]
+  classDependentClassClasses: [ClassDependentClass]
+  classDependentClassParentClasses: [ClassDependentClass]
+  classesLanguages: [ClassesLanguage]
+  masterClasses: [MasterClass]
+}
+
+type ClassCustomProperty {
+  setPropID: Int!
+  classID: Int!
+  propertyID: Int!
+  sortkey: String
+  show: Boolean
+  showSortKey: Int
+  delimiter: Int
+  termination: String
+  formula: String
+  userCreated: Boolean!
+  class: Class
+  property: Property
+}
+
+type ClassDependentClass {
+  setID: Int!
+  parentClassID: Int!
+  classID: Int!
+  feature: Int
+  class: Class
+  parentClass: Class
+}
+
+type ClassesLanguage {
+  id: Int!
+  classID: Int!
+  languageID: Int!
+  label: String
+  class: Class
+}
+
+type Drawing {
+  drawingIndex: Long!
+  drawingUID: String!
+  drawingID: String
+  filename: String
+  identNummer: String
+  cIdentnumber: String
+  lastChanged: DateTime
+  lastChangedBy: String
+  drawingType: String
+  projectIndexNavigation: Project
+  projectIndex: Long!
+  functionGroups: [FunctionGroup]
+  processFunctions: [ProcessFunction]
+  Properties: [DrawingProp]
+}
+
+type DrawingProp {
+  Value: String
+  Name: String
+  label: String
+  propertyID: Int
+}
+
+type EQM {
+  drawingIndex: Long!
+  id: Int!
+  guid: String
+  autom_EQM_Tag: String
+  autom_EQM_Description: String
+  autom_EQM_LongDescription: String
+  drawingUID: String
+  parentID: Int!
+  drawingIndexNavigation: Drawing
+  automationFunctions: [Function]
+}
+
+type FileExitsResult {
+  exits: Boolean!
+  url: String
+  fileGuid: String
+  fileName: String
+}
+
+type Function {
+  drawingIndex: Long!
+  id: String
+  name: String
+  eqm_ID: String
+  sortKey: Long!
+  autom_Description: String
+  eqmIndexNavigation: EQM
+  automationFunctionStates: [FunctionState]
+}
+
+type FunctionGroup {
+  functionGroupIndex: Long!
+  functionGroupUID: String!
+  functionGroupName: String
+  customerFctGroup: String
+  identNo: String
+  customerIdentNo: String
+  drawingIndex: Long!
+  drawingIndexNavigation: Drawing
+  processFunctions: [ProcessFunction]
+  Properties: [FunctionGroupProp]
+}
+
+type FunctionGroupProp {
+  Value: String
+  Name: String
+  label: String
+}
+
+type FunctionProp {
+  Value: String
+  Name: String
+  label: String
+  propertyID: Int
+  sortKey: String
+  propertyType: PropertyType @cost(weight: "10")
+}
+
+type FunctionState {
+  drawingIndex: Long!
+  id: String
+  name: String
+  functionID: String
+  sortKey: Long!
+  autom_Description: String
+  automationFunctionIndexNavigation: Function
+  automationFunctionSteps: [FunctionStep]
+}
+
+type FunctionStep {
+  drawingIndex: Long!
+  id: String
+  name: String
+  functionStateID: String!
+  sortKey: Long!
+  autom_Description: String
+  autom_STEP_Type: String
+  autom_STEP_TI: String
+  automationFunctionStateIndexNavigation: FunctionState
+  automationFunctionStepCMStates: [FunctionStepCMState]
+  imageUrl: String
+}
+
+type FunctionStepCMState {
+  drawingIndex: Long!
+  drawingIndexNavigation: Drawing
+  cm_ID: String
+  cmIndexNavigation: CMGroup
+  cmStateID: Int!
+  cmStateIndexNavigation: CMMainState
+  functionStepID: String
+  functionStepIndexNavigation: FunctionStep
+}
+
+type Language {
+  id: Int!
+  propertyID: Int!
+  languageID: Int!
+  label: String
+  format: String
+  oldFormat: String
+  description: String
+  property: Property
+  entry: String!
+}
+
+type Master {
+  masterID: Int!
+  masterName: String
+  shapeExchange: Boolean
+  operationStateExport: Boolean
+  operationStateQuantityOf: Int
+  norm: String
+  normSection: String
+  normRegNo: String
+  useMasterInLegend: Boolean
+  labelFilter: Boolean
+  defaultLayer: String
+  masterClasses: [MasterClass]
+  masterStencils: [MasterStencil]
+  mastersLanguages: [MastersLanguage]
+  stencilNames: [String]
+  classIDs: [Int!]
+}
+
+type MasterClass {
+  setID: Int!
+  masterID: Int!
+  classID: Int!
+  class: Class
+  master: Master
+}
+
+type MasterStencil {
+  setID: Int!
+  masterID: Int!
+  filename: String!
+  filenameNavigation: Stencil
+  master: Master
+}
+
+type MastersLanguage {
+  id: Int!
+  masterID: Int!
+  languageID: Int!
+  label: String
+  master: Master
+}
+
+type PlantSection {
+  plantSectionIndex: Long!
+  projectIndex: Long!
+  identNumber: String!
+  cIdentNumber: String
+  plantName1: String
+  plantName2: String
+  plantName3: String
+  drawings: [Drawing]
+  functionGroups: [FunctionGroup]
+  projectIndexNavigation: Project
+}
+
+type ProcessFunction {
+  TagName: String
+  processFunctionIndex: Long!
+  processFunctionUID: UUID!
+  CustomerTagName: String
+  lastEditDate: DateTime
+  lastEditedBy: String
+  class: String
+  subClass: String
+  muid: Int
+  drawingIndex: Long!
+  drawingIndexNavigation: Drawing
+  functionGroupIndex: Long
+  functionGroupIndexNavigation: FunctionGroup
+  Properties: [FunctionProp]
+}
+
+type Project {
+  foldername: String @cost(weight: "10")
+  projectIndex: Long!
+  contractID: String
+  contractName: String
+  customer: String
+  unitConfig: String!
+  drawings: [Drawing]
+  plantSections: [PlantSection]
+}
+
+type Property {
+  propertyID: Int!
+  propertyName: String!
+  word: Boolean
+  excel: Boolean
+  visible: String
+  showPropertyOnPage: String
+  showProperty: Boolean
+  type: Int
+  valueType: Int
+  constValue: Boolean
+  check: String
+  updateDirection: Int
+  propertyGUID: String
+  word_Visible: String
+  excel_Visible: String
+  propertyType: Int
+  required: String
+  sub_CLASS_LIST: String
+  subClassList: String
+  sortingMethod: Int
+  regEx: String
+  unitTypeID: Int
+  visibleDialogProject: Boolean
+  orgVisible: String
+  labelFilter: Boolean!
+  userCreated: Boolean!
+  classCustomProperties: [ClassCustomProperty]
+  languages: [Language]
+  unitType: UnitType
+}
+
+type Query {
+  status: String!
+  projects: [Project!]! @cost(weight: "10")
+  project(projectIndex: Long!): Project @cost(weight: "10")
+  drawing(drawingIndex: Long!): Drawing @cost(weight: "10")
+  processFunction(
+    where: ProcessFunctionFilterInput @cost(weight: "10")
+  ): [ProcessFunction]! @cost(weight: "10")
+  properties: [Property!]! @cost(weight: "10")
+  drawingSVG(drawingIndex: Long!, embedded: Boolean! = false): FileExitsResult!
+    @cost(weight: "10")
+  automationEQMs(
+    drawingIndex: Long!
+    where: EQMFilterInput @cost(weight: "10")
+  ): [EQM!]! @cost(weight: "10")
+  automationStep(uid: String!): FunctionStep @cost(weight: "10")
+  projectRelativeFile(
+    projectIndex: Long!
+    relativePath: String!
+    embedded: Boolean! = false
+  ): FileExitsResult! @cost(weight: "10")
+  drawingRelativeFile(
+    drawingIndex: Long!
+    relativePath: String!
+    embedded: Boolean! = false
+  ): FileExitsResult! @cost(weight: "10")
+}
+
+type Stencil {
+  id: Int!
+  filename: String!
+  invisible: Boolean!
+  drawingType: String
+  sortKey: Int
+  retailStencil: Boolean!
+  db_Version: Int
+  version: Int
+  masterStencils: [MasterStencil]
+  stencilFiles: [StencilFile]
+}
+
+type StencilFile {
+  id: Int!
+  filename: String!
+  languageID: Int!
+  title: String
+  vss: [Byte!]
+  filenameNavigation: Stencil
+}
+
+type Unit {
+  unitID: Int!
+  unitTypeID: Int
+  name: String
+  unit1: String
+  conversionFactor: Float
+  possibleUnit: String
+  dexpiUnit: String
+  conversionDelta: Float
+  sortingNr: Int
+  unitType: UnitType
+}
+
+type UnitType {
+  unitTypeID: Int!
+  unitTypeName: String
+  stdUnitSI: Int
+  stdUnitImp: Int
+  dontConvert: Int
+  properties: [Property]
+  unitTypesLanguages: [UnitTypesLanguage]
+  units: [Unit]
+}
+
+type UnitTypesLanguage {
+  id: Int!
+  unitTypeID: Int!
+  languageID: Int!
+  label: String
+  unitType: UnitType
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean @cost(weight: "10")
+  neq: Boolean @cost(weight: "10")
+}
+
+input CMGroupFilterInput {
+  and: [CMGroupFilterInput!]
+  or: [CMGroupFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: IntOperationFilterInput
+  cmGuid: StringOperationFilterInput
+  autom_CM_Tag: StringOperationFilterInput
+  autom_CM_Description: StringOperationFilterInput
+  autom_CM_LongDescription: StringOperationFilterInput
+  autom_CM_IsGroup: BooleanOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  parentID: IntOperationFilterInput
+  eqmGuid: StringOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  automationFunctionStepCMStates: ListFilterInputTypeOfFunctionStepCMStateFilterInput
+  automationCMStates: ListFilterInputTypeOfCMStateFilterInput
+}
+
+input CMMainStateFilterInput {
+  and: [CMMainStateFilterInput!]
+  or: [CMMainStateFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: IntOperationFilterInput
+  autom_CM_STATE: StringOperationFilterInput
+  autom_CM_DESCRIPTION: StringOperationFilterInput
+  autom_CM_STATE_COLOR: StringOperationFilterInput
+  autom_CM_STATE_ACTIVE: BooleanOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  automationFunctionStepCMStates: ListFilterInputTypeOfFunctionStepCMStateFilterInput
+}
+
+input CMStateFilterInput {
+  and: [CMStateFilterInput!]
+  or: [CMStateFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: IntOperationFilterInput
+  main_ID: IntOperationFilterInput
+  cm_ID: StringOperationFilterInput
+  autom_CM_STATE: StringOperationFilterInput
+  autom_CM_DESCRIPTION: StringOperationFilterInput
+  autom_CM_RUNTIME_PARAMETERS: StringOperationFilterInput
+  autom_CM_CONFIG_PARAMETERS: StringOperationFilterInput
+  autom_CM_STATE_COLOR: StringOperationFilterInput
+  cmIndexNavigation: CMGroupFilterInput
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime @cost(weight: "10")
+  neq: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  nin: [DateTime] @cost(weight: "10")
+  gt: DateTime @cost(weight: "10")
+  ngt: DateTime @cost(weight: "10")
+  gte: DateTime @cost(weight: "10")
+  ngte: DateTime @cost(weight: "10")
+  lt: DateTime @cost(weight: "10")
+  nlt: DateTime @cost(weight: "10")
+  lte: DateTime @cost(weight: "10")
+  nlte: DateTime @cost(weight: "10")
+}
+
+input DrawingFilterInput {
+  and: [DrawingFilterInput!]
+  or: [DrawingFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  projectIndex: LongOperationFilterInput
+  plantSectionIndex: LongOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  drawingID: StringOperationFilterInput
+  contractID: StringOperationFilterInput
+  drawingType: StringOperationFilterInput
+  identNummer: StringOperationFilterInput
+  cIdentnumber: StringOperationFilterInput
+  computername: StringOperationFilterInput
+  path: StringOperationFilterInput
+  filename: StringOperationFilterInput
+  lastChanged: DateTimeOperationFilterInput
+  lastChangedBy: StringOperationFilterInput
+  exportState: BooleanOperationFilterInput
+  exportDate: DateTimeOperationFilterInput
+  username: StringOperationFilterInput
+  pipeListData: StringOperationFilterInput
+  pipeElements: StringOperationFilterInput
+  pipeNeedUpdate: BooleanOperationFilterInput
+  functionGroups: ListFilterInputTypeOfFunctionGroupFilterInput
+  functionProps: ListFilterInputTypeOfDrawingPropFilterInput
+  plantSectionIndexNavigation: PlantSectionFilterInput
+  processFunctions: ListFilterInputTypeOfProcessFunctionFilterInput
+  automationEQMs: ListFilterInputTypeOfEQMFilterInput
+  automationCMMainStates: ListFilterInputTypeOfCMMainStateFilterInput
+  automationCMGroups: ListFilterInputTypeOfCMGroupFilterInput
+  automationFunctionStepCMStates: ListFilterInputTypeOfFunctionStepCMStateFilterInput
+  inletOutlets: ListFilterInputTypeOfInletOutletFilterInput
+  mountingUnits: ListFilterInputTypeOfMountingUnitFilterInput
+  projectIndexNavigation: ProjectFilterInput
+}
+
+input DrawingPropFilterInput {
+  and: [DrawingPropFilterInput!]
+  or: [DrawingPropFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  id: IntOperationFilterInput
+  functionID: StringOperationFilterInput
+  label: StringOperationFilterInput
+  property: StringOperationFilterInput
+  value: StringOperationFilterInput
+  valueType: StringOperationFilterInput
+  show: StringOperationFilterInput
+  sortKey: StringOperationFilterInput
+  propertyID: IntOperationFilterInput
+  selectedIndex: IntOperationFilterInput
+  unit: StringOperationFilterInput
+  translatedValue: StringOperationFilterInput
+  propertyType: IntOperationFilterInput
+  format: StringOperationFilterInput
+  numericValue: FloatOperationFilterInput
+  numericValueUnitID: IntOperationFilterInput
+  newValue: StringOperationFilterInput
+}
+
+input EQMFilterInput {
+  and: [EQMFilterInput!]
+  or: [EQMFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: IntOperationFilterInput
+  guid: StringOperationFilterInput
+  autom_EQM_Tag: StringOperationFilterInput
+  autom_EQM_Description: StringOperationFilterInput
+  autom_EQM_LongDescription: StringOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  parentID: IntOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  automationFunctions: ListFilterInputTypeOfFunctionFilterInput
+}
+
+input FloatOperationFilterInput {
+  eq: Float @cost(weight: "10")
+  neq: Float @cost(weight: "10")
+  in: [Float] @cost(weight: "10")
+  nin: [Float] @cost(weight: "10")
+  gt: Float @cost(weight: "10")
+  ngt: Float @cost(weight: "10")
+  gte: Float @cost(weight: "10")
+  ngte: Float @cost(weight: "10")
+  lt: Float @cost(weight: "10")
+  nlt: Float @cost(weight: "10")
+  lte: Float @cost(weight: "10")
+  nlte: Float @cost(weight: "10")
+}
+
+input FunctionFilterInput {
+  and: [FunctionFilterInput!]
+  or: [FunctionFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: StringOperationFilterInput
+  name: StringOperationFilterInput
+  eqm_ID: StringOperationFilterInput
+  sortKey: LongOperationFilterInput
+  autom_Description: StringOperationFilterInput
+  eqmIndexNavigation: EQMFilterInput
+  automationFunctionStates: ListFilterInputTypeOfFunctionStateFilterInput
+}
+
+input FunctionGroupFilterInput {
+  and: [FunctionGroupFilterInput!]
+  or: [FunctionGroupFilterInput!]
+  functionGroupIndex: LongOperationFilterInput
+  drawingIndex: LongOperationFilterInput
+  plantSectionIndex: LongOperationFilterInput
+  functionGroupID: StringOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  functionGroupName: StringOperationFilterInput
+  identNo: StringOperationFilterInput
+  descriptionGer: StringOperationFilterInput
+  descriptionEng: StringOperationFilterInput
+  customerFctGroup: StringOperationFilterInput
+  exportState: BooleanOperationFilterInput
+  updateShape: BooleanOperationFilterInput
+  multiShapeParent: StringOperationFilterInput
+  customerIdentNo: StringOperationFilterInput
+  reportSelected: BooleanOperationFilterInput
+  exists: BooleanOperationFilterInput
+  visioId: IntOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  functionProps: ListFilterInputTypeOfFunctionGroupPropFilterInput
+  plantSectionIndexNavigation: PlantSectionFilterInput
+  processFunctions: ListFilterInputTypeOfProcessFunctionFilterInput
+}
+
+input FunctionGroupPropFilterInput {
+  and: [FunctionGroupPropFilterInput!]
+  or: [FunctionGroupPropFilterInput!]
+  functionGroupIndex: LongOperationFilterInput
+  functionGroupIndexNavigation: FunctionGroupFilterInput
+  id: IntOperationFilterInput
+  functionID: StringOperationFilterInput
+  label: StringOperationFilterInput
+  property: StringOperationFilterInput
+  value: StringOperationFilterInput
+  valueType: StringOperationFilterInput
+  show: StringOperationFilterInput
+  sortKey: StringOperationFilterInput
+  propertyID: IntOperationFilterInput
+  selectedIndex: IntOperationFilterInput
+  unit: StringOperationFilterInput
+  translatedValue: StringOperationFilterInput
+  propertyType: IntOperationFilterInput
+  format: StringOperationFilterInput
+  numericValue: FloatOperationFilterInput
+  numericValueUnitID: IntOperationFilterInput
+  newValue: StringOperationFilterInput
+}
+
+input FunctionPropFilterInput {
+  and: [FunctionPropFilterInput!]
+  or: [FunctionPropFilterInput!]
+  processFunctionIndex: LongOperationFilterInput
+  processFunctionIndexNavigation: ProcessFunctionFilterInput
+  id: IntOperationFilterInput
+  functionID: StringOperationFilterInput
+  label: StringOperationFilterInput
+  property: StringOperationFilterInput
+  value: StringOperationFilterInput
+  valueType: StringOperationFilterInput
+  show: StringOperationFilterInput
+  sortKey: StringOperationFilterInput
+  propertyID: IntOperationFilterInput
+  selectedIndex: IntOperationFilterInput
+  unit: StringOperationFilterInput
+  translatedValue: StringOperationFilterInput
+  propertyType: IntOperationFilterInput
+  format: StringOperationFilterInput
+  numericValue: FloatOperationFilterInput
+  numericValueUnitID: IntOperationFilterInput
+  newValue: StringOperationFilterInput
+}
+
+input FunctionStateFilterInput {
+  and: [FunctionStateFilterInput!]
+  or: [FunctionStateFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: StringOperationFilterInput
+  name: StringOperationFilterInput
+  functionID: StringOperationFilterInput
+  sortKey: LongOperationFilterInput
+  autom_Description: StringOperationFilterInput
+  automationFunctionIndexNavigation: FunctionFilterInput
+  automationFunctionSteps: ListFilterInputTypeOfFunctionStepFilterInput
+}
+
+input FunctionStepCMStateFilterInput {
+  and: [FunctionStepCMStateFilterInput!]
+  or: [FunctionStepCMStateFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  cm_ID: StringOperationFilterInput
+  cmIndexNavigation: CMGroupFilterInput
+  cmStateID: IntOperationFilterInput
+  cmStateIndexNavigation: CMMainStateFilterInput
+  functionStepID: StringOperationFilterInput
+  functionStepIndexNavigation: FunctionStepFilterInput
+}
+
+input FunctionStepFilterInput {
+  and: [FunctionStepFilterInput!]
+  or: [FunctionStepFilterInput!]
+  drawingIndex: LongOperationFilterInput
+  id: StringOperationFilterInput
+  name: StringOperationFilterInput
+  functionStateID: StringOperationFilterInput
+  sortKey: LongOperationFilterInput
+  autom_Description: StringOperationFilterInput
+  autom_STEP_Type: StringOperationFilterInput
+  autom_STEP_TI: StringOperationFilterInput
+  automationFunctionStateIndexNavigation: FunctionStateFilterInput
+  automationFunctionStepCMStates: ListFilterInputTypeOfFunctionStepCMStateFilterInput
+}
+
+input InletOutletFilterInput {
+  and: [InletOutletFilterInput!]
+  or: [InletOutletFilterInput!]
+  inletOutletIndex: LongOperationFilterInput
+  inOutID: StringOperationFilterInput
+  inOutID_GUID: UuidOperationFilterInput
+  drawingIndex: LongOperationFilterInput
+  contractID: StringOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  inOutNo: StringOperationFilterInput
+  source: StringOperationFilterInput
+  destination: StringOperationFilterInput
+  description: StringOperationFilterInput
+  flowProduct: StringOperationFilterInput
+  needUpdate: BooleanOperationFilterInput
+  functionGroupID: StringOperationFilterInput
+  class: StringOperationFilterInput
+  subClass: StringOperationFilterInput
+  muid: IntOperationFilterInput
+  tpNo: StringOperationFilterInput
+  tpToFgr: StringOperationFilterInput
+  tpToCFgr: StringOperationFilterInput
+  tpToIdentNumber: StringOperationFilterInput
+  tpToCIdentNumber: StringOperationFilterInput
+  tpToUID: StringOperationFilterInput
+  tpToFgrUID: StringOperationFilterInput
+  exportState: BooleanOperationFilterInput
+  userClass: StringOperationFilterInput
+  userSubClass: StringOperationFilterInput
+  pinXmm: FloatOperationFilterInput
+  pinYmm: FloatOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+}
+
+input IntOperationFilterInput {
+  eq: Int @cost(weight: "10")
+  neq: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  nin: [Int] @cost(weight: "10")
+  gt: Int @cost(weight: "10")
+  ngt: Int @cost(weight: "10")
+  gte: Int @cost(weight: "10")
+  ngte: Int @cost(weight: "10")
+  lt: Int @cost(weight: "10")
+  nlt: Int @cost(weight: "10")
+  lte: Int @cost(weight: "10")
+  nlte: Int @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCMGroupFilterInput {
+  all: CMGroupFilterInput @cost(weight: "10")
+  none: CMGroupFilterInput @cost(weight: "10")
+  some: CMGroupFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCMMainStateFilterInput {
+  all: CMMainStateFilterInput @cost(weight: "10")
+  none: CMMainStateFilterInput @cost(weight: "10")
+  some: CMMainStateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCMStateFilterInput {
+  all: CMStateFilterInput @cost(weight: "10")
+  none: CMStateFilterInput @cost(weight: "10")
+  some: CMStateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDrawingFilterInput {
+  all: DrawingFilterInput @cost(weight: "10")
+  none: DrawingFilterInput @cost(weight: "10")
+  some: DrawingFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDrawingPropFilterInput {
+  all: DrawingPropFilterInput @cost(weight: "10")
+  none: DrawingPropFilterInput @cost(weight: "10")
+  some: DrawingPropFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfEQMFilterInput {
+  all: EQMFilterInput @cost(weight: "10")
+  none: EQMFilterInput @cost(weight: "10")
+  some: EQMFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionFilterInput {
+  all: FunctionFilterInput @cost(weight: "10")
+  none: FunctionFilterInput @cost(weight: "10")
+  some: FunctionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionGroupFilterInput {
+  all: FunctionGroupFilterInput @cost(weight: "10")
+  none: FunctionGroupFilterInput @cost(weight: "10")
+  some: FunctionGroupFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionGroupPropFilterInput {
+  all: FunctionGroupPropFilterInput @cost(weight: "10")
+  none: FunctionGroupPropFilterInput @cost(weight: "10")
+  some: FunctionGroupPropFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionPropFilterInput {
+  all: FunctionPropFilterInput @cost(weight: "10")
+  none: FunctionPropFilterInput @cost(weight: "10")
+  some: FunctionPropFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionStateFilterInput {
+  all: FunctionStateFilterInput @cost(weight: "10")
+  none: FunctionStateFilterInput @cost(weight: "10")
+  some: FunctionStateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionStepCMStateFilterInput {
+  all: FunctionStepCMStateFilterInput @cost(weight: "10")
+  none: FunctionStepCMStateFilterInput @cost(weight: "10")
+  some: FunctionStepCMStateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfFunctionStepFilterInput {
+  all: FunctionStepFilterInput @cost(weight: "10")
+  none: FunctionStepFilterInput @cost(weight: "10")
+  some: FunctionStepFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfInletOutletFilterInput {
+  all: InletOutletFilterInput @cost(weight: "10")
+  none: InletOutletFilterInput @cost(weight: "10")
+  some: InletOutletFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfMountingUnitFilterInput {
+  all: MountingUnitFilterInput @cost(weight: "10")
+  none: MountingUnitFilterInput @cost(weight: "10")
+  some: MountingUnitFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfPlantSectionFilterInput {
+  all: PlantSectionFilterInput @cost(weight: "10")
+  none: PlantSectionFilterInput @cost(weight: "10")
+  some: PlantSectionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfProcessFunctionFilterInput {
+  all: ProcessFunctionFilterInput @cost(weight: "10")
+  none: ProcessFunctionFilterInput @cost(weight: "10")
+  some: ProcessFunctionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input LongOperationFilterInput {
+  eq: Long @cost(weight: "10")
+  neq: Long @cost(weight: "10")
+  in: [Long] @cost(weight: "10")
+  nin: [Long] @cost(weight: "10")
+  gt: Long @cost(weight: "10")
+  ngt: Long @cost(weight: "10")
+  gte: Long @cost(weight: "10")
+  ngte: Long @cost(weight: "10")
+  lt: Long @cost(weight: "10")
+  nlt: Long @cost(weight: "10")
+  lte: Long @cost(weight: "10")
+  nlte: Long @cost(weight: "10")
+}
+
+input MountingUnitFilterInput {
+  and: [MountingUnitFilterInput!]
+  or: [MountingUnitFilterInput!]
+  mountingUnitIndex: LongOperationFilterInput
+  mountingUnitID: StringOperationFilterInput
+  drawingIndex: LongOperationFilterInput
+  mountingUnitTAG: StringOperationFilterInput
+  cMountingUnit: StringOperationFilterInput
+  description: StringOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+}
+
+input PlantSectionFilterInput {
+  and: [PlantSectionFilterInput!]
+  or: [PlantSectionFilterInput!]
+  plantSectionIndex: LongOperationFilterInput
+  projectIndex: LongOperationFilterInput
+  identNumber: StringOperationFilterInput
+  cIdentNumber: StringOperationFilterInput
+  plantName1: StringOperationFilterInput
+  plantName2: StringOperationFilterInput
+  plantName3: StringOperationFilterInput
+  drawings: ListFilterInputTypeOfDrawingFilterInput
+  functionGroups: ListFilterInputTypeOfFunctionGroupFilterInput
+  projectIndexNavigation: ProjectFilterInput
+}
+
+input ProcessFunctionFilterInput {
+  and: [ProcessFunctionFilterInput!]
+  or: [ProcessFunctionFilterInput!]
+  processFunctionIndex: LongOperationFilterInput
+  drawingIndex: LongOperationFilterInput
+  functionGroupIndex: LongOperationFilterInput
+  shapeType: IntOperationFilterInput
+  functionID: StringOperationFilterInput
+  functionID_GUID: UuidOperationFilterInput
+  functionTag: StringOperationFilterInput
+  functionGroupID: StringOperationFilterInput
+  drawingUID: StringOperationFilterInput
+  customFunction: StringOperationFilterInput
+  class: StringOperationFilterInput
+  subType: StringOperationFilterInput
+  muid: IntOperationFilterInput
+  master: StringOperationFilterInput
+  showWord: BooleanOperationFilterInput
+  showExcel: BooleanOperationFilterInput
+  ident: StringOperationFilterInput
+  subClass: StringOperationFilterInput
+  userClass: StringOperationFilterInput
+  mountingUnitID: StringOperationFilterInput
+  pageUID: StringOperationFilterInput
+  exportState: BooleanOperationFilterInput
+  classes: StringOperationFilterInput
+  updateShape: BooleanOperationFilterInput
+  shapeVersion: StringOperationFilterInput
+  databaseVersion: IntOperationFilterInput
+  connectedTo: StringOperationFilterInput
+  multiShapeParent: StringOperationFilterInput
+  multiFrameParent: StringOperationFilterInput
+  multiShapeParentFNO: StringOperationFilterInput
+  reportSelected: BooleanOperationFilterInput
+  exists: BooleanOperationFilterInput
+  parent: StringOperationFilterInput
+  creationDate: DateTimeOperationFilterInput
+  lastEditDate: DateTimeOperationFilterInput
+  lastEditedBy: StringOperationFilterInput
+  pinXmm: FloatOperationFilterInput
+  pinYmm: FloatOperationFilterInput
+  visioType: StringOperationFilterInput
+  visioId: IntOperationFilterInput
+  drawingIndexNavigation: DrawingFilterInput
+  functionGroupIndexNavigation: FunctionGroupFilterInput
+  functionProps: ListFilterInputTypeOfFunctionPropFilterInput
+}
+
+input ProjectFilterInput {
+  and: [ProjectFilterInput!]
+  or: [ProjectFilterInput!]
+  projectIndex: LongOperationFilterInput
+  path: StringOperationFilterInput
+  contractID: StringOperationFilterInput
+  contractName: StringOperationFilterInput
+  customer: StringOperationFilterInput
+  unitConfig: StringOperationFilterInput
+  drawings: ListFilterInputTypeOfDrawingFilterInput
+  plantSections: ListFilterInputTypeOfPlantSectionFilterInput
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String @cost(weight: "10")
+  neq: String @cost(weight: "10")
+  contains: String @cost(weight: "20")
+  ncontains: String @cost(weight: "20")
+  in: [String] @cost(weight: "10")
+  nin: [String] @cost(weight: "10")
+  startsWith: String @cost(weight: "20")
+  nstartsWith: String @cost(weight: "20")
+  endsWith: String @cost(weight: "20")
+  nendsWith: String @cost(weight: "20")
+}
+
+input UuidOperationFilterInput {
+  eq: UUID @cost(weight: "10")
+  neq: UUID @cost(weight: "10")
+  in: [UUID] @cost(weight: "10")
+  nin: [UUID] @cost(weight: "10")
+  gt: UUID @cost(weight: "10")
+  ngt: UUID @cost(weight: "10")
+  gte: UUID @cost(weight: "10")
+  ngte: UUID @cost(weight: "10")
+  lt: UUID @cost(weight: "10")
+  nlt: UUID @cost(weight: "10")
+  lte: UUID @cost(weight: "10")
+  nlte: UUID @cost(weight: "10")
+}
+
+enum PropertyType {
+  STRING
+  LIST_FIX
+  NUMBER
+  BOOL
+  LIST_VAR
+  DATE
+  DURATION
+  CURRENCY
+  RANGE
+  MEMO
+  PATH
+  FILE
+  FILE_WORD
+  FILE_EXCEL
+  HYPER_LINK
+  DATA_MEDIA
+  DATA_MATERIAL_CLASS
+  DATA_ARTICLE
+  RICH_TEXT
+  PROJECT_DATA_FORM
+  PLANT_SECTION_DATA_FORM
+  MASS_FLOW_DATA
+  YES_NO
+  YES_NO_NEUTRAL
+  SPIN_VALUE
+  PICTURE
+  PICTURE_UPLOAD
+  PROCENT_VALUE
+  DATA_SETS
+  NON_EDIT_STRING
+  NON_EDIT_STRING_CONST_REFRESH
+  UNIT_DATA
+  PIPE_CLASS_FORM
+  COLOR_TEXT_LIST
+  OPTION_LIST
+}
+
+# "The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+# "The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+# directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+# "The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
+
+# "The `DateTime` scalar represents an ISO-8601 compliant date time type."
+# scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+# "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

@@ -6,6 +6,7 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
+    "example_datahub_module": "file:",
     "jsonwebtoken": "^9.0.2",
     "uuid": "^9.0.1"
   }
