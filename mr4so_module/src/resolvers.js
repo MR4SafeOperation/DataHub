@@ -114,10 +114,15 @@ const resolvers = {
         roesbergData,
         roesbergDataAggregate,
 
+        status:()=>{return "Online"},
+
         //xvisualSchema
         projects: ResolveXVisualApi,
         drawing: ResolveXVisualApi,
         drawingSVG: ResolveXVisualApi,
+     
+        automationStep: ResolveXVisualApi,
+
     },
 }
 
