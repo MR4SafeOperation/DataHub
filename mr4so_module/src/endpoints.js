@@ -22,7 +22,7 @@ client.on("message", async (topic, message) => {
   const value = message.toString();
   console.log("Received: ", topic, value);
 
-  const cypherQuery = "CREATE (d:DemonstratorPlantData {topic : $topic, value: $value }) RETURN d";
+  const cypherQuery = "MERGE (d:DemonstratorPlantData {topic : $topic }) ON CREATE SET d.value = $value ON MATCH SET d.value = $value RETURN d";
 
   try {
     const result = await executeCypher(cypherQuery, { topic, value });
