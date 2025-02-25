@@ -700,10 +700,6 @@ The DataHub server automatically calls this function during initialization, prov
 
 ## 4 Module Creation
 
-A new module can be created, for example, in the following steps by copying an
-
-## 4 Module Creation
-
 A new module can be created, for example, in the following steps by copying and editing an existing module, such as the included example_module.
 
 ### 4.1 Creating a Module Copy
