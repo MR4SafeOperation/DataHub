@@ -14,6 +14,7 @@
    - [GraphQL Schema](#31-graphql-schema)
    - [JavaScript](#32-javascript)
    - [File Service](#33-file-service)
+   - [MQTT Integration](#34-mqtt-integration)
 4. [Modulerstellung](#4-modulerstellung)
    - [Kopie eines Moduls erstellen](#41-kopie-eines-moduls-erstellen)
    - [Anpassen der Datei package.json](#42-anpassen-der-datei-packagejson)
@@ -134,6 +135,130 @@ Es gibt zwei Möglichkeiten, eine Datei herunterzuladen:
 
 Weitere Informationen zum File Service:
 https://github.com/foprs/datahub-mr4b/blob/main/server/example_module/FILESERVICE.md
+
+### 3.4 MQTT Integration
+
+Der MR4B DataHub bietet die Möglichkeit, Daten über MQTT (Message Queuing Telemetry Transport) zu empfangen und in der Datenbank zu speichern. MQTT ist ein leichtgewichtiges Nachrichtenprotokoll, das für IoT-Anwendungen und die Machine-to-Machine (M2M) Kommunikation optimiert ist.
+
+#### 3.4.1 Konfiguration der MQTT-Verbindung
+
+Um MQTT in einem Modul zu integrieren, muss zunächst die MQTT-Client-Bibliothek installiert werden:
+
+```bash
+npm install mqtt --save
+```
+
+Dann kann die Verbindung zum MQTT-Broker in der Datei endpoints.js im src-Unterverzeichnis konfiguriert werden:
+
+```javascript
+import mqtt from 'mqtt';
+
+export function applyEndpoints(datahub) {
+  var app = datahub.app;
+  var executeCypher = datahub.executeCypher;
+  
+  // MQTT-Client mit der Broker-Adresse initialisieren
+  const client = mqtt.connect("mqtt://[BROKER-ADRESSE]:[PORT]");
+  
+  // Event-Handler für erfolgreiche Verbindung
+  client.on("connect", () => {
+    console.log("Verbunden mit MQTT-Broker");
+    // Themen abonnieren
+    client.subscribe("[THEMA]/#", (err) => {
+      if (!err) {
+        console.log("Thema abonniert");
+      } else {
+        console.error("Fehler beim Abonnieren:", err);
+      }
+    });
+  });
+  
+  // Event-Handler für eingehende Nachrichten
+  client.on("message", async (topic, message) => {
+    const value = message.toString();
+    console.log("Empfangen:", topic, value);
+    
+    // Speichern der Daten in der Datenbank mittels Cypher-Query
+    const cypherQuery = "CREATE (d:IhrDatenTyp {topic: $topic, value: $value}) RETURN d";
+    try {
+      const result = await executeCypher(cypherQuery, { topic, value });
+      const savedNode = result.records[0].get("d").properties;
+      console.log("Daten gespeichert", savedNode);
+    } catch (error) {
+      console.error("Fehler beim Speichern der Daten:", error.message);
+    }
+  });
+  
+  // Event-Handler für Fehler
+  client.on("error", (error) => {
+    console.error("MQTT-Fehler:", error);
+  });
+}
+```
+
+#### 3.4.2 Anwendungsbeispiel: Demonstrator-Anlagendaten
+
+Im folgenden Beispiel wird eine Integration für einen Anlagendemonstrator implementiert:
+
+```javascript
+import mqtt from 'mqtt';
+export function applyEndpoints(datahub) {
+  var app = datahub.app;
+  var executeCypher = datahub.executeCypher;
+  
+  const client = mqtt.connect("mqtt://192.168.178.11:1883");
+  client.on("connect", () => {
+    console.log("Connected to Demonstrator | MQTT-Server")
+    client.subscribe("MR4SO/#", (err) => {
+      if (!err) {
+        console.log("Topic MR4SO/# suscribed")
+      } else {
+        console.error("Error at subscribing: ", err)
+      }
+    });
+  });
+  client.on("message", async (topic, message) => {
+    const value = message.toString();
+    console.log("Received: ", topic, value);
+    const cypherQuery = "CREATE (d:DemonstratorPlantData {topic : $topic, value: $value }) RETURN d";
+    try {
+      const result = await executeCypher(cypherQuery, { topic, value });
+      const savedNode = result.records[0].get("d").properties;
+      console.log("Data saved", savedNode);
+    } catch (error) {
+      console.error("Error while writing DemonstratorPlantData:", error.message);
+    }
+  });
+  client.on("error", (error) => {
+    console.error("MQTT error:", error);
+  });
+}
+```
+
+Das entsprechende GraphQL-Schema für den neuen Datentyp in der Datei types.graphql sieht wie folgt aus:
+
+```graphql
+type DemonstratorPlantData {
+  topic: String!
+  value: String!
+}
+```
+
+#### 3.4.3 Integration in die Modulkonfiguration
+
+Um die MQTT-Integration zu aktivieren, muss die applyEndpoints-Funktion in der module.js exportiert werden:
+
+```javascript
+import {getResolvers} from './src/resolvers.js';
+import {applyEndpoints} from "./src/endpoints.js";
+
+export {
+    getResolvers,
+    applyEndpoints as initModule
+};
+```
+
+Der DataHub-Server ruft diese Funktion automatisch während der Initialisierung auf und übergibt dabei Zugriff auf die Express-App (`app`) und die Datenbank-Funktionen, wie z.B. `executeCypher` für Neo4j-Datenbankabfragen.
 
 ## 4 Modulerstellung
 
@@ -315,8 +440,6 @@ Nun sollten im Frontend für den neuen Typ Einträge auf Basis der Daten aus der
 ---
 ---
 
-# English
-
 # Guide to Creating an MR4B DataHub Module
 
 ## Table of Contents
@@ -329,6 +452,7 @@ Nun sollten im Frontend für den neuen Typ Einträge auf Basis der Daten aus der
    - [GraphQL Schema](#31-graphql-schema)
    - [JavaScript](#32-javascript)
    - [File Service](#33-file-service)
+   - [MQTT Integration](#34-mqtt-integration)
 4. [Module Creation](#4-module-creation)
    - [Creating a Module Copy](#41-creating-a-module-copy)
    - [Modifying package.json](#42-modifying-packagejson)
@@ -449,6 +573,134 @@ There are two ways to download a file:
 
 More information about the File Service:
 https://github.com/foprs/datahub-mr4b/blob/main/server/example_module/FILESERVICE.md
+
+### 3.4 MQTT Integration
+
+The MR4B DataHub offers the capability to receive data via MQTT (Message Queuing Telemetry Transport) and store it in the database. MQTT is a lightweight messaging protocol optimized for IoT applications and Machine-to-Machine (M2M) communication.
+
+#### 3.4.1 Configuring the MQTT Connection
+
+To integrate MQTT in a module, first install the MQTT client library:
+
+```bash
+npm install mqtt --save
+```
+
+Then, the connection to the MQTT broker can be configured in the endpoints.js file in the src subdirectory:
+
+```javascript
+import mqtt from 'mqtt';
+
+export function applyEndpoints(datahub) {
+  var app = datahub.app;
+  var executeCypher = datahub.executeCypher;
+  
+  // Initialize MQTT client with broker address
+  const client = mqtt.connect("mqtt://[BROKER-ADDRESS]:[PORT]");
+  
+  // Event handler for successful connection
+  client.on("connect", () => {
+    console.log("Connected to MQTT broker");
+    // Subscribe to topics
+    client.subscribe("[TOPIC]/#", (err) => {
+      if (!err) {
+        console.log("Topic subscribed");
+      } else {
+        console.error("Error subscribing:", err);
+      }
+    });
+  });
+  
+  // Event handler for incoming messages
+  client.on("message", async (topic, message) => {
+    const value = message.toString();
+    console.log("Received:", topic, value);
+    
+    // Store data in the database using Cypher query
+    const cypherQuery = "CREATE (d:YourDataType {topic: $topic, value: $value}) RETURN d";
+    try {
+      const result = await executeCypher(cypherQuery, { topic, value });
+      const savedNode = result.records[0].get("d").properties;
+      console.log("Data saved", savedNode);
+    } catch (error) {
+      console.error("Error saving data:", error.message);
+    }
+  });
+  
+  // Event handler for errors
+  client.on("error", (error) => {
+    console.error("MQTT error:", error);
+  });
+}
+```
+
+#### 3.4.2 Application Example: Demonstrator Plant Data
+
+In the following example, an integration for a plant demonstrator is implemented:
+
+```javascript
+import mqtt from 'mqtt';
+export function applyEndpoints(datahub) {
+  var app = datahub.app;
+  var executeCypher = datahub.executeCypher;
+  
+  const client = mqtt.connect("mqtt://192.168.178.11:1883");
+  client.on("connect", () => {
+    console.log("Connected to Demonstrator | MQTT-Server")
+    client.subscribe("MR4SO/#", (err) => {
+      if (!err) {
+        console.log("Topic MR4SO/# suscribed")
+      } else {
+        console.error("Error at subscribing: ", err)
+      }
+    });
+  });
+  client.on("message", async (topic, message) => {
+    const value = message.toString();
+    console.log("Received: ", topic, value);
+    const cypherQuery = "CREATE (d:DemonstratorPlantData {topic : $topic, value: $value }) RETURN d";
+    try {
+      const result = await executeCypher(cypherQuery, { topic, value });
+      const savedNode = result.records[0].get("d").properties;
+      console.log("Data saved", savedNode);
+    } catch (error) {
+      console.error("Error while writing DemonstratorPlantData:", error.message);
+    }
+  });
+  client.on("error", (error) => {
+    console.error("MQTT error:", error);
+  });
+}
+```
+
+The corresponding GraphQL schema for the new data type in the types.graphql file looks like this:
+
+```graphql
+type DemonstratorPlantData {
+  topic: String!
+  value: String!
+}
+```
+
+#### 3.4.3 Integration into the Module Configuration
+
+To enable the MQTT integration, the applyEndpoints function must be exported in the module.js file:
+
+```javascript
+import {getResolvers} from './src/resolvers.js';
+import {applyEndpoints} from "./src/endpoints.js";
+
+export {
+    getResolvers,
+    applyEndpoints as initModule
+};
+```
+
+The DataHub server automatically calls this function during initialization, providing access to the Express app (`app`) and database functions, such as `executeCypher` for Neo4j database queries.
+
+## 4 Module Creation
+
+A new module can be created, for example, in the following steps by copying an
 
 ## 4 Module Creation
 
