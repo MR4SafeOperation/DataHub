@@ -4,7 +4,6 @@ export function applyEndpoints(datahub) {
 
 var app = datahub.app;
 var executeCypher = datahub.executeCypher;
- console.log("Params",datahub);
 const client = mqtt.connect("mqtt://192.168.178.11:1883");
 
 client.on("connect", () => {
