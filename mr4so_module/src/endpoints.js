@@ -1,7 +1,22 @@
-﻿import axios from 'axios';
+﻿
 import mqtt from 'mqtt';
 import xvisualConnection from './xvisualConnection.js';
 export function applyEndpoints(datahub) {
+
+  //TODO this will simulate changing live data for debugging
+  setInterval(async() => {
+
+    const cypherQuery = "MERGE (d:DemonstratorPlantData {topic : $topic }) ON CREATE SET d.value = $value ON MATCH SET d.value = $value RETURN d";
+    try {
+      const currentTime = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      const result = await executeCypher(cypherQuery, { topic: "ServerTime", value: currentTime });
+      const savedNode = result.records[0].get("d").properties;
+      console.log("Data saved", savedNode);
+    } catch (error) {
+      console.error("Error while writing DemonstratorPlantData:", error.message);
+    }
+  }, 1000);
+
 
   var app = datahub.app;
   var executeCypher = datahub.executeCypher;
