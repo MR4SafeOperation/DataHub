@@ -12,9 +12,6 @@ async function readStream(body) {
 }
 
 
-
-
-
 class XVisualConnection {
     constructor() {
         this.xApiKey = process.env.XVISUAL_API_KEY;
@@ -41,7 +38,7 @@ class XVisualConnection {
         // console.log("info :", info);
         // console.log("context type", typeof context);
         // console.log("context :", context.req.body);
-        console.log("Endpoint :", this.Endpoint);
+   
         // console.log("xvisualConnection.XVisualConnectionInstance :",  xvisualConnection.XVisualConnectionInstance);
         // var instance=xvisualConnection.getInstance();
         // instance.test();
@@ -54,8 +51,9 @@ class XVisualConnection {
             // // Access the query property c
             // const query = jsonObject.query;
             console.log("ExtractedQuerry", rawbody.query);
-
-            const response = await fetch(this.Endpoint, {
+            const fullUrl = new URL("api/", this.Endpoint);
+            console.log("X-Visual Grapql Endpoint :",fullUrl.href ,fullUrl);
+            const response = await fetch(fullUrl.href, {
                 method: 'POST', headers: {
                     'Content-Type': 'application/json',
                     'X-Api-Key': this.xApiKey

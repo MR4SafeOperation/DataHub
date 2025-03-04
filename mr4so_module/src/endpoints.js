@@ -11,7 +11,7 @@ export function applyEndpoints(datahub) {
       const currentTime = new Date().toLocaleTimeString('en-GB', { hour12: false });
       const result = await executeCypher(cypherQuery, { topic: "ServerTime", value: currentTime });
       const savedNode = result.records[0].get("d").properties;
-      console.log("Data saved", savedNode);
+     // console.log("Data saved", savedNode);
     } catch (error) {
       console.error("Error while writing DemonstratorPlantData:", error.message);
     }
