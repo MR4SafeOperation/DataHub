@@ -45,7 +45,7 @@ https://docs.docker.com/desktop/setup/install/windows-install/
 - Mindestens 20 GB freier Speicherplatz sind zu empfehlen.
 
 ### 2.2 Node.js
-
+npm -v
 https://nodejs.org/en/download/prebuilt-installer
 
 **Hinweis:** Standard Installation, aktuell müssen keine Optionen geändert oder zusätzlich ausgewählt werden.

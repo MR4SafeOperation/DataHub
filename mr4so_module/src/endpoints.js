@@ -1,58 +1,61 @@
-﻿
-import mqtt from 'mqtt';
+﻿import mqtt from 'mqtt';
 import xvisualConnection from './xvisualConnection.js';
+import {
+  initCypherExecutor,
+  deleteNodes,
+  saveDemonstratorPlantData,
+  saveServerStatus,
+  deleteServerStatusesExcept
+} from './mqttClient.js';
+
 export function applyEndpoints(datahub) {
+  const app = datahub.app;
+  const executeCypher = datahub.executeCypher; //executeCypher is a function to execute cypher queries in the database,
+                                               //  which is passed from the datahub to the endpoints.js file, 
+                                               // and will be passed to the mqttClient.js file
 
-  //TODO this will simulate changing live data for debugging
-  setInterval(async() => {
+  // this is to send the executeCypher to the mqttClient.js to be used in the functions in there
+  initCypherExecutor(executeCypher);
 
-    const cypherQuery = "MERGE (d:DemonstratorPlantData {topic : $topic }) ON CREATE SET d.value = $value ON MATCH SET d.value = $value RETURN d";
-    try {
-      const currentTime = new Date().toLocaleTimeString('en-GB', { hour12: false });
-      const result = await executeCypher(cypherQuery, { topic: "ServerTime", value: currentTime });
-      const savedNode = result.records[0].get("d").properties;
-     // console.log("Data saved", savedNode);
-    } catch (error) {
-      console.error("Error while writing DemonstratorPlantData:", error.message);
-    }
-  }, 1000);
-
-
-  var app = datahub.app;
-  var executeCypher = datahub.executeCypher;
   const client = mqtt.connect(process.env.MQQTSERVER_IP);
 
   client.on("connect", () => {
-    console.log("Connected to Demonstrator | MQTT-Server")
+    console.log("Connected to Demonstrator | MQTT-Server");
     client.subscribe("MR4SO/#", (err) => {
       if (!err) {
-        console.log("Topic MR4SO/# suscribed")
+        console.log("Topic MR4SO/# subscribed");
       } else {
-        console.error("Error at subscribing: ", err)
+        console.error("Error at subscribing: ", err);
       }
     });
   });
 
+  let lastReceivedMethod = null;
+  let lastUpdatedTime = null;
+
   client.on("message", async (topic, message) => {
     const value = message.toString();
-    console.log("Received: ", topic, value);
+    const lastUpdated = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    lastReceivedMethod = topic;
+    lastUpdatedTime = lastUpdated;
 
-    const cypherQuery = "MERGE (d:DemonstratorPlantData {topic : $topic }) ON CREATE SET d.value = $value ON MATCH SET d.value = $value RETURN d";
-
-    try {
-      const result = await executeCypher(cypherQuery, { topic, value });
-      const savedNode = result.records[0].get("d").properties;
-      console.log("Data saved", savedNode);
-    } catch (error) {
-      console.error("Error while writing DemonstratorPlantData:", error.message);
-    }
-
+    console.log("Received:", topic, value, lastUpdated);
+    await saveDemonstratorPlantData(topic, value, lastUpdated);
   });
+
+  // Initial cleanup (run the next line if you want to delete nodes in the database)
+  //deleteNodes({ type: "DemonstratorPlantData" });
+
+  setInterval(async () => {
+    await saveServerStatus(lastReceivedMethod, lastUpdatedTime);
+    //await deleteServerStatusesExcept("current");
+  }, 1000);
 
   client.on("error", (error) => {
     console.error("MQTT error:", error);
   });
 
+  // Endpoints
   app.get('/hello_world', (req, res) => {
     res.send('Hello World');
   });
@@ -65,4 +68,3 @@ export function applyEndpoints(datahub) {
     return xvisualConnection.getInstance().ForwardHTTP(req, res);
   });
 }
-

@@ -92,4 +92,13 @@ type DemonstratorPlantData
 {
     topic: String!
     value: String!
+    lastUpdated: String
+}
+
+type ServerStatus 
+{
+    id: String!
+    serverTime: String
+    lastUpdated: String
+    method: String
 }
