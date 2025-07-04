@@ -102,3 +102,10 @@ type ServerStatus
     lastUpdated: String
     method: String
 }
+
+
+type TestDemoData
+{
+    id: String!
+    data: String
+}

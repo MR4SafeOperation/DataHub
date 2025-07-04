@@ -1,8 +1,50 @@
+import mqtt from 'mqtt';
+
+const client = mqtt.connect(process.env.MQQTSERVER_IP);
+
 let executeCypherRef; 
 
 export function initCypherExecutor(executor) {
   executeCypherRef = executor;
 }
+
+client.on("connect", () => {
+  console.log("Connected to Demonstrator | MQTT-Server");
+  client.subscribe("MR4SO/#", (err) => {
+    if (!err) {
+      console.log("Topic MR4SO/# subscribed");
+    } else {
+      console.error("Error at subscribing: ", err);
+    }
+  });
+});
+
+let lastReceivedMethod = null;
+let lastUpdatedTime = null;
+
+client.on("message", async (topic, message) => {
+  const value = message.toString();
+  const lastUpdated = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  lastReceivedMethod = topic;
+  lastUpdatedTime = lastUpdated;
+
+  console.log("Received:", topic, value, lastUpdated);
+  await saveDemonstratorPlantData(topic, value, lastUpdated);
+});
+
+// Initial cleanup (run the next line if you want to delete nodes in the database)
+//deleteNodes({ type: "DemonstratorPlantData" });
+
+setInterval(async () => {
+  await saveServerStatus(lastReceivedMethod, lastUpdatedTime);
+  //await deleteServerStatusesExcept("current");
+}, 1000);
+
+client.on("error", (error) => {
+  console.error("MQTT error:", error);
+});
+
+
 
 export async function deleteNodes({ type, key = null, value = null }) {
   let cypherQuery;
@@ -77,4 +119,19 @@ export async function deleteServerStatusesExcept(id = 'current') {
   } catch (error) {
     console.error("Error deleting ServerStatus nodes:", error.message);
   }
+}
+
+export async function publishMessage(topic, message) {
+  return new Promise((resolve, reject) => {
+    if(!client){
+      return reject(new Error("MQTT client not connected!"));
+    }
+    client.publish(topic, message, (err) => {
+      if(err){
+        reject(err);
+      }else{
+        resolve();
+      }
+    })
+  })  
 }

@@ -1,5 +1,6 @@
 const FAKE_API_URL = 'https://reqres.in/api/users';
 
+import { publishMessage } from './mqttClient.js';
 import xvisualConnection from './xvisualConnection.js';
 /**
 * Resolver for fetching RoesbergData with custom fields from an external data source.
@@ -80,8 +81,19 @@ const resolvers = {
         automationStep: ResolveXVisualApi,
 
     },
+    Mutation: {
+        customTriggerTestDemoDataAction: async (_, { id, data }) => {
+                const topic = `MR4SO/${id}/commands`;
+                const payload = JSON.stringify({data});
+            try{
+                await publishMessage(topic, payload);
+                return true;
+            }catch(err){
+                console.error("MQTT publish failed:", err);
+                return false;
+            }
+        }
+    }
 }
 
 export const getResolvers = () => resolvers;
-
-
