@@ -1,6 +1,5 @@
-﻿
-import xvisualConnection from './xvisualConnection.js';
-import {initCypherExecutor} from './mqttClient.js';
+﻿import xvisualConnection from './xvisualConnection.js';
+import {initCypherExecutor, initMQTTClient} from './mqttClient.js';
 
 
 export function applyEndpoints(datahub) {
@@ -11,6 +10,7 @@ export function applyEndpoints(datahub) {
 
   // this is to send the executeCypher to the mqttClient.js to be used in the functions in there
   initCypherExecutor(executeCypher);
+  initMQTTClient();
 
   app.get('/hello_world', (req, res) => {
     res.send('Hello World');
