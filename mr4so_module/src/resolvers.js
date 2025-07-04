@@ -77,7 +77,7 @@ const resolvers = {
         projects: ResolveXVisualApi,
         drawing: ResolveXVisualApi,
         drawingSVG: ResolveXVisualApi,
-
+        drawings: ResolveXVisualApi,
         automationStep: ResolveXVisualApi,
 
     },
