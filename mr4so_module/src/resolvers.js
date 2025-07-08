@@ -79,6 +79,7 @@ const resolvers = {
         drawingSVG: ResolveXVisualApi,
         drawings: ResolveXVisualApi,
         automationStep: ResolveXVisualApi,
+        processFunction: ResolveXVisualApi,
 
     },
     Mutation: {
