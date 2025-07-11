@@ -130,7 +130,6 @@ Ein Datei-Upload kann z.B. mit Postman durchgeführt werden.
 
 <img width="911" height="414" alt="image" src="https://github.com/user-attachments/assets/44b0b81c-5ffe-4c84-8c1b-87e53d1f8fa1" />
 
-
 #### 3.3.2 Löschen
 
 Zum Löschen von Dateien kann folgender Endpunkt genutzt werden:
@@ -568,9 +567,19 @@ The MR4B DataHub provides a FileService consisting of predefined REST endpoints 
 #### 3.3.1 Upload
 
 The following endpoints can be used for uploading:
-- POST /file/upload (multipart/form-data)
-- PUT /file/upload (multipart/form-data)
-- PUT /file/upload/{:identifier} (multipart/form-data)
+- POST /file (multipart/form-data)
+- PUT /file (multipart/form-data)
+- PUT /file/{:identifier} (multipart/form-data)
+
+A file upload can be performed using Postman, for example.
+- You must select POST or PUT as the request method.
+- For the URL, enter something like http://localhost:8000/file, replacing localhost with the desired file upload endpoint/server.
+- In the Body section, select "form-data". Then, use a field with the key "content_file" and choose the type "File". The desired file should be set under Value, and the file must be uploaded.
+- The header is automatically set by Postman when files are selected: Content-Type: multipart/form-data.
+- Send the request using the Send button.
+- A status of 201 Created confirms a newly created file, and 200 OK confirms an overwrite of an existing file during the upload.
+  
+<img width="911" height="414" alt="image" src="https://github.com/user-attachments/assets/44b0b81c-5ffe-4c84-8c1b-87e53d1f8fa1" />
 
 #### 3.3.2 Delete
 
@@ -779,6 +788,9 @@ The resolvers.js can be structured like this:
 
 ```javascript
 const FAKE_API_URL = 'https://reqres.in/api/users';
+const headers = {
+        'x-api-key': 'reqres-free-v1'
+};
 
 /**
 * Resolver for fetching RoesbergData with custom fields from an external data source.
@@ -788,7 +800,7 @@ async function roesbergData(parent, args, context, info) {
     limit = limit || 10;
     offset = offset || 0;
 
-    let res = await fetch(FAKE_API_URL);
+    let res = await fetch(FAKE_API_URL, { headers });
     let { per_page, total } = await res.json();
 
     if (offset > total || offset < 0) {
@@ -800,7 +812,7 @@ async function roesbergData(parent, args, context, info) {
 
     const pagePromises = [];
     for (let i = pageOffset; i <= pageLimit; i++) {
-        pagePromises.push(fetch(FAKE_API_URL + "?page=" + i));
+		pagePromises.push(fetch(`${FAKE_API_URL}?page=${i}`, { headers }));
     }
 
     const pageResponses = await Promise.all(pagePromises);
@@ -827,7 +839,7 @@ async function roesbergData(parent, args, context, info) {
  * in order to dynamically generate the tables.
  */
 async function roesbergDataAggregate(parent, args, context, info) {
-    const res = await fetch(FAKE_API_URL);
+    const res = await fetch(FAKE_API_URL, { headers });
     const resJson = await res.json();
     return {count: resJson.total};
 }
