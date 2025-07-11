@@ -339,6 +339,9 @@ Die resolvers.js kann z.B. so aufgebaut werden:
 
 ```javascript
 const FAKE_API_URL = 'https://reqres.in/api/users';
+const headers = {
+        'x-api-key': 'reqres-free-v1'
+};
 
 /**
 * Resolver for fetching RoesbergData with custom fields from an external data source.
@@ -348,7 +351,7 @@ async function roesbergData(parent, args, context, info) {
     limit = limit || 10;
     offset = offset || 0;
 
-    let res = await fetch(FAKE_API_URL);
+    let res = await fetch(FAKE_API_URL, { headers });
     let { per_page, total } = await res.json();
 
     if (offset > total || offset < 0) {
@@ -360,7 +363,7 @@ async function roesbergData(parent, args, context, info) {
 
     const pagePromises = [];
     for (let i = pageOffset; i <= pageLimit; i++) {
-        pagePromises.push(fetch(FAKE_API_URL + "?page=" + i));
+		pagePromises.push(fetch(`${FAKE_API_URL}?page=${i}`, { headers }));
     }
 
     const pageResponses = await Promise.all(pagePromises);
@@ -387,7 +390,7 @@ async function roesbergData(parent, args, context, info) {
  * in order to dynamically generate the tables.
  */
 async function roesbergDataAggregate(parent, args, context, info) {
-    const res = await fetch(FAKE_API_URL);
+    const res = await fetch(FAKE_API_URL, { headers });
     const resJson = await res.json();
     return {count: resJson.total};
 }
