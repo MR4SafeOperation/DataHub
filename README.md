@@ -122,8 +122,8 @@ Folgende Endpunkte können zum Hochladen verwendet werden:
 
 Ein Datei-Upload kann z.B. mit Postman durchgeführt werden. 
 - Als Request-Methode muss dazu POST oder PUT ausgewählt werden. 
-- Als URL wird dann z.B. http://localhost:8000/file angegeben, wobei localhost durch den gewünschten File-Upload-Endpunkt/Server ersetzt werden muss.
-- Als Body muss form-data ausgewählt werden. Dann muss ein Feld mit Key content_data verwendet werden und der Typ File ausgewählt werden. Die gewünschte Datei muss unter Value festgelegt werden und hochgeladen werden.
+- Als URL wird dann z.B. "http://localhost:8000/file" angegeben, wobei localhost durch den gewünschten File-Upload-Endpunkt/Server ersetzt werden muss.
+- Als Body muss "form-data" ausgewählt werden. Dann muss ein Feld mit Key "content_file" verwendet werden und der Typ "File" ausgewählt werden. Die gewünschte Datei muss unter Value festgelegt werden. Die Datei muss hochgeladen werden.
 - Der Header wird bei Auswahl von Dateien von Postman automatisch gesetzt: Content-Type: multipart/form-data
 - Senden mit Send-Button.
 - Als Status wird beim Upload mit "201 Created" eine neu erstellte Datei bestätigt und mit "200 OK" das Überschreiben einer existierenden Datei.
