@@ -103,9 +103,8 @@ type ServerStatus
     method: String
 }
 
-
-type TestDemoData
+type PlantDataAction
 {
-    id: String!
-    data: String
+    topic: String!
+    action: String!
 }

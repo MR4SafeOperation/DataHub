@@ -83,11 +83,9 @@ const resolvers = {
 
     },
     Mutation: {
-        customTriggerTestDemoDataAction: async (_, { id, data }) => {
-                const topic = `MR4SO/${id}/commands`;
-                const payload = JSON.stringify({data});
+        triggerPlantDataAction: async (_, {topic, action }) => {
             try{
-                await publishMessage(topic, payload);
+                await publishMessage(topic, action);
                 return true;
             }catch(err){
                 console.error("MQTT publish failed:", err);
