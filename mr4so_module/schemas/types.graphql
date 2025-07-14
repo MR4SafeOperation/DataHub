@@ -70,6 +70,13 @@ type User @jwt {
     username: String
 }
 
+type ChecklistFile
+{
+    id: ID! @id
+    fileIdentifier: String
+    fileName: String
+}
+
 type ExternalUser
 @mutation(operations: []) # Make this type read-only
 {
