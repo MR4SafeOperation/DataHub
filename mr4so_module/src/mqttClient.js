@@ -8,7 +8,13 @@ export function initCypherExecutor(executor) {
 }
 
 export function initMQTTClient(){
-  client = mqtt.connect(process.env.MQQTSERVER_IP);
+  client = mqtt.connect(process.env.MQQTSERVER_IP,{
+    username : process.env.MQTT_USERNAME,
+    password : process.env.MQTT_PASSWORD,
+    clientId : "MR4SO",
+    connectTimeout: 4000,
+    reconnectPeriod: 1000
+  });
 
   client.on("connect", () => {
     console.log("Connected to Demonstrator | MQTT-Server");
