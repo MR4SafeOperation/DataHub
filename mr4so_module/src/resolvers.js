@@ -85,7 +85,9 @@ const resolvers = {
     Mutation: {
         triggerPlantDataAction: async (_, {topic, action }) => {
             try{
+                
                 await publishMessage(topic, action);
+                console.log("Triggered action for topic:"+topic+ " with value:"+ action);
                 return true;
             }catch(err){
                 console.error("MQTT publish failed:", err);
