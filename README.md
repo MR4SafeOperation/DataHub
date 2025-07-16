@@ -143,6 +143,10 @@ Es gibt zwei Möglichkeiten, eine Datei herunterzuladen:
 - Ohne Authentifizierungs-Header: Der Client sendet eine GET-Anfrage mit einem temporären JWT-Token, welches als URL-Pfadparameter angefügt ist.
   `GET /file/get_token/{:identifier}`
 
+Ein Datei-Download kann z.B. mit Postman getestet werden.
+- Der File Identifier, der beim Hochladen festgelegt wurde, muss angegeben werden.
+<img width="859" height="411" alt="Postman_GET" src="https://github.com/user-attachments/assets/d38940d9-afa6-42bc-b5f0-5a9defa327ad" />
+
 Weitere Informationen zum File Service:
 https://github.com/foprs/datahub-mr4b/blob/main/server/example_module/FILESERVICE.md
 
@@ -593,6 +597,11 @@ There are two ways to download a file:
   `GET /file/{:identifier}`
 - Without Authentication Header: The client sends a GET request with a temporary JWT token appended as a URL path parameter.
   `GET /file/get_token/{:identifier}`
+
+
+A file download can be tested with Postman, for example:
+- The file identifier, that was detereminded for the file upload, must be given
+<img width="859" height="411" alt="Postman_GET" src="https://github.com/user-attachments/assets/d38940d9-afa6-42bc-b5f0-5a9defa327ad" />
 
 More information about the File Service:
 https://github.com/foprs/datahub-mr4b/blob/main/server/example_module/FILESERVICE.md
