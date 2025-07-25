@@ -5,12 +5,13 @@ const oauth_model = {
     generateAccessToken: (client, user, scope) => {
         // The user object generated in getUser() is passed as user argument.
         // In this example, we attach its content as payload to the jwt:
-        return jwt.sign(user, process.env.JWT_SECRET, {algorithm: "HS256", jwtid: uuid(), expiresIn: "1y"});
+        return jwt.sign(user, process.env.JWT_SECRET, {algorithm: "HS256", jwtid: uuid(), expiresIn: "1h"});
     },
 
     getClient: (clientId, clientSecret) => {
+        if(clientId != process.env.CLIENT_ID) return
         return {
-            id: "any-app",         // Accept all client types in this example
+            id: clientId,
             grants: ["password"],
             // In this example we only accept the deprecated Password Grant authentication method.
             // But you can and should implement other grant types for your model.
@@ -20,9 +21,9 @@ const oauth_model = {
     },
 
     getAccessToken(accessToken) {
-        // For demonstration, make token expire one year after it was issued.
+        // For demonstration, make token expire one hour after it was issued.
         const accessTokenExpiresAt = new Date();
-        accessTokenExpiresAt.setFullYear(accessTokenExpiresAt.getFullYear() + 1);
+        accessTokenExpiresAt.setHours(accessTokenExpiresAt.getHours() + 1);
 
         let user;
         try {
@@ -43,7 +44,6 @@ const oauth_model = {
 
     getUser: async (username, password) => {
         // Validation function for the Password Grant authentication method.
-
         if (
             !username ||
             !password ||
@@ -75,10 +75,9 @@ export async function getOAuthServerOptions({executeCypher}) {
 
     return {
         model: oauth_model,
-        accessTokenLifetime: 60 * 60 * 24 * 365,
+        accessTokenLifetime: 60 * 60,
     };
 }
 
-
-// export const getProtectedEndpoints = ({apiEndpoint}) => [apiEndpoint, '/hello_user']
-export const getProtectedEndpoints = ({apiEndpoint}) => []
+export const getProtectedEndpoints = (datahub, context) => [...datahub.defaultRestrictedPaths]
+// export const getProtectedEndpoints = ({apiEndpoint}) => []

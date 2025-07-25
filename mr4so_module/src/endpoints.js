@@ -16,6 +16,10 @@ export function applyEndpoints(datahub) {
     res.send('Hello World');
   });
 
+  app.get('/status', (req, res) => {
+    res.json({ status: 'Online' });
+  });
+
   app.get('/hello_user', (req, res) => {
     res.send('Hello, ' + res.locals?.oauth?.token?.user?.username);
   });
