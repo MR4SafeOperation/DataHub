@@ -1,6 +1,23 @@
 ﻿import jwt from "jsonwebtoken";
 import {v4 as uuid} from 'uuid';
 
+const users = [
+    {username: "mr4b", password: "datahub", role: "admin"},
+    {username: "john", password: "jdoe", role: "user"},
+];
+
+export const permissions = {
+  admin: {
+    Query: ['demonstratorPlantData'],
+    Mutation: ['triggerPlantDataAction']
+  },
+  user: {
+    Query: ['demonstratorPlantData'],
+    Mutation: []
+  }
+};
+
+
 const oauth_model = {
     generateAccessToken: (client, user, scope) => {
         // The user object generated in getUser() is passed as user argument.
@@ -38,22 +55,26 @@ const oauth_model = {
         return {
             accessToken,
             accessTokenExpiresAt,
-            user: {username: user.username}
+            user: {username: user.username, role: user.role}
         }
     },
 
     getUser: async (username, password) => {
         // Validation function for the Password Grant authentication method.
-        if (
-            !username ||
-            !password ||
-            username !== process.env.DEFAULT_USERNAME ||
-            password !== process.env.DEFAULT_PASSWORD
-        )
-            //TODO: Replace with actual validation of credentials
-            return null;
+        let user = users.find(u => u.username === username);
 
-        return {username}; // dummy user Object, TODO: Create your custom user object
+        if (!username ||
+            !password ||
+            // username !== process.env.DEFAULT_USERNAME ||
+            // password !== process.env.DEFAULT_PASSWORD
+            !user ||
+            user.password !== password
+            )
+            {
+                return null;
+            }
+
+        return {username: user.username, role: user.role};
     },
 
     saveToken: (token, client, user) => {

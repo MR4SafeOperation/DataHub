@@ -2,6 +2,7 @@ const FAKE_API_URL = 'https://reqres.in/api/users';
 
 import { publishMessage } from './mqttClient.js';
 import xvisualConnection from './xvisualConnection.js';
+import { permissions } from './auth.js';
 /**
 * Resolver for fetching RoesbergData with custom fields from an external data source.
 */
@@ -83,9 +84,13 @@ const resolvers = {
 
     },
     Mutation: {
-        triggerPlantDataAction: async (_, {topic, action }) => {
+        triggerPlantDataAction: async (parent, {topic, action }, context, info) => {
             try{
-                
+                if(!getUserPermission(context.authorization?.jwt.role, 'Mutation', info.fieldName)){
+                    console.log("Can't trigger action for topic: "+topic+ " with value: "+ action+" -> no permission!");
+                    return false;
+                }
+
                 await publishMessage(topic, action);
                 console.log("Triggered action for topic:"+topic+ " with value:"+ action);
                 return true;
@@ -95,6 +100,10 @@ const resolvers = {
             }
         }
     }
+}
+
+function getUserPermission(role, operationType, operationName){
+    return permissions[role]?.[operationType]?.includes(operationName) || false;
 }
 
 export const getResolvers = () => resolvers;
