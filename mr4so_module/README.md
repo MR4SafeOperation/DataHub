@@ -291,3 +291,30 @@ deleting and serving files.
 
 Pleases see the [File Service Documentation](FILESERVICE.md) for more information about the File Service and how to use
 and configure it.
+
+Additionally, this needs to be inserted into the DB:
+The response of the upload contains the generated or pre-defined file identifier as a JSON-stringified string, e.g.: "22a1cc81-3a47-4cac-b94d-c9c77c1a6fb0.json"
+In the GraphQL Frontend (accessible with license) open the table for "ChecklistFile" and add an entry with the response as "fileIdentifier" and a self-created "fileName" e.g. "MainChecklist". 
+
+Alternatively, the API can be used without the need of access to the frontend:
+**Operation**
+mutation Mutation($input: [ChecklistFileCreateInput!]!) {
+  createChecklistFiles(input: $input) {
+    checklistFiles {
+      fileName
+      fileIdentifier
+    }
+  }
+}
+
+**Variables**
+{
+  "input": [
+    {
+      "fileName": "MainChecklist",
+      "fileIdentifier": "22a1cc81-3a47-4cac-b94d-c9c77c1a6fb0.json"
+    }
+  ]
+}
+
+Now the checklist file should appear inside the MR-Application.
